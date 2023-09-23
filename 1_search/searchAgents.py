@@ -448,7 +448,6 @@ class FoodSearchProblem:
                 return 999999
             cost += 1
         return cost
-
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
@@ -484,8 +483,25 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    # Extract position and foodGrid from state
+    heuristic_value = 0
+    # Convert the foodGrid to a list of coordinates where food exists
+    food_list = foodGrid.asList()
+    # If there is no food left, return 0
+    if not food_list:
+        return 0
+    max_distance = float('-inf')
+    all_distances = []
+
+    for food_position in food_list:
+        distance = util.manhattanDistance(position, food_position)
+        all_distances.append(distance)
+        if distance > max_distance:
+            max_distance = distance
+            farthest_food = food_position
+    
+    heuristic_value = util.manhattanDistance(position, farthest_food)
+    return heuristic_value
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
