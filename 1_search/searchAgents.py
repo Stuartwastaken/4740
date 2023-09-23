@@ -296,14 +296,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (self.startingPosition, set())
+        
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        return len(state[1]) == 4
 
     def getSuccessors(self, state: Any):
         """
@@ -325,6 +327,15 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(state[0][0] + dx), int(state[0][1] + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                nextPos = (nextx, nexty)
+                nextCorners = set(state[1])
+                if nextPos in self.corners:
+                    nextCorners.add(nextPos)
+                successors.append(((nextPos, nextCorners), action, 1))
             "*** YOUR CODE HERE ***"
 
         self._expanded += 1 # DO NOT CHANGE
@@ -359,6 +370,25 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    current_position, corners_visited = state
+    heuristic_value = 0
+    remaining_corners = list(set(corners) - corners_visited)
+    while remaining_corners:
+        min_distance = float('inf')
+        for corner in remaining_corners:
+            distance = util.manhattanDistance(current_position, corner)      
+            if distance < min_distance:
+                #Update min_distance with the calculated distance.
+                min_distance = distance
+                #Update the closest_corner with the current corner.
+                closest_corner = corner
+        # Add min_distance to heuristic_value
+        heuristic_value += min_distance
+        current_position = closest_corner
+        remaining_corners.remove(closest_corner)
+    return heuristic_value
+
+        
 
     "*** YOUR CODE HERE ***"
     return 0 # Default to trivial solution
